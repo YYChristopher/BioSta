@@ -1,0 +1,23 @@
+permutation test:（教材9.75）
+cau_1 <- runif(12,1,199)
+cau_2 <- runif(17,200,399)
+cau_3 <- runif(15,400,599)
+cau_4 <- runif(9,600,800)
+aa_1 <- runif(28,1,199)
+aa_2 <- runif(10,200,399)
+aa_3 <- runif(5,400,599)
+aa_4 <- runif(3,600,800)
+tot_vec <- c(cau_1,cau_2,cau_3,cau_4,aa_1,aa_2,aa_3,aa_4)
+rankpro <- rank(tot_vec)
+r_stand <- sum(rankpro[1:53])
+arch <- numeric(100000)
+for(i in 1:100000){
+  res <- sample(rankpro,53,replace = FALSE)
+  arch[i] <- sum(res)
+}
+arch_low <- arch[arch<=r_stand]
+arch_high <- arch[arch>=r_stand]
+len_1 <- length(arch_low)
+len_2 <- length(arch_high)
+p_value <- 2*min(len_1,len_2,50000)/100000
+p_value

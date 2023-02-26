@@ -1,0 +1,179 @@
+Wilcoxon秩和与t检验势函数比较：
+n1 <- 20
+n2 <- 20
+n <- n1+n2
+tri <- 1000
+vec1 <- matrix(0,tri,n1)
+vec2 <- matrix(0,tri,n2)
+m11 <- rep(0,tri)
+m12 <- rep(0,tri)
+m13 <- rep(0,tri)
+m14 <- rep(0,tri)
+m15 <- rep(0,tri)
+m16 <- rep(0,tri)
+m17 <- rep(0,tri)
+m18 <- rep(0,tri)
+m21 <- rep(0,tri)
+m22 <- rep(0,tri)
+m23 <- rep(0,tri)
+m24 <- rep(0,tri)
+m25 <- rep(0,tri)
+m26 <- rep(0,tri)
+m27 <- rep(0,tri)
+m28 <- rep(0,tri)
+res1 <- matrix(0,tri,8)
+res2 <- matrix(0,tri,8)
+res <- matrix(0,tri,8)
+rankst <- matrix(0,tri,8)#计算秩的开始
+rankend <- matrix(0,tri,8)#计算秩的末尾
+Rank <- matrix(0,tri,8)#计算秩向量
+R1 <- rep(0,tri)
+wilcox <- rep(0,tri)
+p_val <- rep(0,tri)
+Numofrej <- rep(0,200)
+Numofacc <- rep(0,200)
+prej <- rep(0,200)
+ave1 <- rep(0,tri)
+ave2 <- rep(0,tri)
+s_x1 <- rep(0,tri)
+s_x2 <- rep(0,tri)
+s_w <- rep(0,tri)
+t_sta <- rep(0,tri)
+Numoftrej <- rep(0,200)
+trej <- rep(0,200)
+for(i in 1:200){
+  for(j in 1:tri){
+    vec1[j,] <- as.vector(rnorm(n1,0,1))
+    vec2[j,] <- as.vector(rnorm(n2,-1+0.01*i,1))
+  }
+  for(j in 1:tri){
+    for(k in 1:ncol(vec1)){
+      if(vec1[j,k]>=-4 && vec1[j,k]< -3)
+        m11[j] <- m11[j]+1
+      else if(vec1[j,k]>=-3 && vec1[j,k]< -2)
+        m12[j] <- m12[j]+1
+      else if(vec1[j,k]>=-2 && vec1[j,k]< -1)
+        m13[j] <- m13[j]+1
+      else if(vec1[j,k]>=-1 && vec1[j,k]<0)
+        m14[j] <- m14[j]+1
+      else if(vec1[j,k]>=0 && vec1[j,k]<1)
+        m15[j] <- m15[j]+1
+      else if(vec1[j,k]>=1 && vec1[j,k]<2)
+        m16[j] <- m16[j]+1
+      else if(vec1[j,k]>=2 && vec1[j,k]<3)
+        m17[j] <- m17[j]+1
+      else
+        m18[j] <- m18[j]+1
+      if(vec2[j,k]>=-4 && vec2[j,k]< -3)
+        m21[j] <- m21[j]+1
+      else if(vec2[j,k]>=-3 && vec2[j,k]< -2)
+        m22[j] <- m22[j]+1
+      else if(vec2[j,k]>=-2 && vec2[j,k]< -1)
+        m23[j] <- m23[j]+1
+      else if(vec2[j,k]>=-1 && vec2[j,k]<0)
+        m24[j] <- m24[j]+1
+      else if(vec2[j,k]>=0 && vec2[j,k]<1)
+        m25[j] <- m25[j]+1
+      else if(vec2[j,k]>=1 && vec2[j,k]<2)
+        m26[j] <- m26[j]+1
+      else if(vec2[j,k]>=2 && vec2[j,k]<3)
+        m27[j] <- m27[j]+1
+      else
+        m28[j] <- m28[j]+1
+    }
+  }
+  for(j in 1:tri){
+    res1[j,] <- as.vector(c(m11[j],m12[j],m13[j],m14[j],m15[j],m16[j],m17[j],m18[j]))
+    res2[j,] <- as.vector(c(m21[j],m22[j],m23[j],m24[j],m25[j],m26[j],m27[j],m28[j]))
+    res[j,] <- res1[j,]+res2[j,]
+    rankst[j,1] <- 1
+    for(k in 2:ncol(res)){
+      if(res[j,k]!=0)
+        rankst[j,k] <-sum(res[j,1:k-1])+1
+      else
+        rankst[j,k] <- 0
+    }
+    for(k in 1:ncol(res)){
+      if(res[j,k]!=0)
+        rankend[j,k] <- sum(res[j,1:k])
+      else
+        rankend[j,k] <- 0
+    }
+    for(k in 1:ncol(Rank)){
+      Rank[j,k] <- (rankst[j,k]+rankend[j,k])/2
+    }
+    for(k in 1:ncol(res1)){
+      R1[j] <- R1[j]+res1[j,k]*Rank[j,k]
+    }#求秩和
+    mu <- (n1*(n+1))/2
+    sigma <- sqrt((n1*n2*(n+1))/12)
+    wilcox[j] <- (abs(R1[j]-mu)-0.5)/sigma#计算统计量
+    p_val[j] <- 2*(1-pnorm(wilcox[j],0,1))
+  }
+  alpha <- 0.05
+  quannorm <- qnorm(1-alpha/2,0,1)
+  for(j in 1:tri){
+    if(p_val[j]<0.05){
+      Numofrej[i] <- Numofrej[i]+1
+    }
+    else{
+      Numofacc[i] <- Numofacc[i]+1
+    }
+  }
+  m11 <- rep(0,tri)
+  m12 <- rep(0,tri)
+  m13 <- rep(0,tri)
+  m14 <- rep(0,tri)
+  m15 <- rep(0,tri)
+  m16 <- rep(0,tri)
+  m17 <- rep(0,tri)
+  m18 <- rep(0,tri)
+  m21 <- rep(0,tri)
+  m22 <- rep(0,tri)
+  m23 <- rep(0,tri)
+  m24 <- rep(0,tri)
+  m25 <- rep(0,tri)
+  m26 <- rep(0,tri)
+  m27 <- rep(0,tri)
+  m28 <- rep(0,tri)
+  R1 <- rep(0,tri)
+  wilcox <- rep(0,tri)
+  p_val <- rep(0,tri)
+  
+  for(j in 1:tri){
+    ave1[j] <- mean(vec1[j,])
+    ave2[j] <- mean(vec2[j,])
+    for(k in 1:ncol(vec1)){
+      s_x1[j] <- s_x1[j]+(vec1[j,k]-ave1[j])^2
+      s_x2[j] <- s_x2[j]+(vec2[j,k]-ave2[j])^2
+    }
+    s_w[j] <- (s_x1[j]+s_x2[j])/(n-2)
+    t_sta[j] <- (ave2[j]-ave1[j])/(s_w[j]*sqrt(1/n1+1/n2))
+  }
+  quan_t <- qt(1-alpha/2,n-2)
+  for(j in 1:tri){
+    if(abs(t_sta[j])>quan_t){
+      Numoftrej[i] <- Numoftrej[i]+1
+    }
+  }
+  ave1 <- rep(0,tri)
+  ave2 <- rep(0,tri)
+  s_x1 <- rep(0,tri)
+  s_x2 <- rep(0,tri)
+  s_w <- rep(0,tri)
+  t_sta <- rep(0,tri)
+}
+prej <- Numofrej/1000
+trej <- Numoftrej/1000
+x <- seq(from=-0.99,to=1,by=0.01)
+plot(x,prej,xlim=c(-1,1),ylim=c(0,1),main = "Wilcoxon秩和检验多次模拟的势函数值",xlab="生成两正态分布中心位置的差值",ylab="模拟的势函数值")
+lines(x,prej,lty=1,lwd=1,col="red")
+
+xt <- seq(from=-0.99,to=1,by=0.01)
+plot(xt,trej,xlim=c(-1,1),ylim=c(0,1),main = "t检验多次模拟的势函数值",xlab="生成两正态分布中心位置的差值",ylab="模拟的势函数值")
+lines(xt,trej,lty=1,lwd=1,col="blue")
+
+plot(x,prej,xlim=c(-1,1),ylim=c(0,1),main = "两种检验方法势函数比较",xlab="生成两正态分布中心位置的差值",ylab="模拟的势函数值")
+points(xt,trej)
+lines(x,prej,lty=1,lwd=1,col="red")
+lines(x,trej,lty=1,lwd=1,col="blue")

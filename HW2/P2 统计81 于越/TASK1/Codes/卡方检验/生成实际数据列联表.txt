@@ -1,0 +1,19 @@
+生成实际列联表：
+library(vcd)
+head(Arthritis)
+  
+table(Arthritis$Treatment,Arthritis$Improved)
+with(Arthritis,table(Treatment,Improved))
+mytable <- xtabs(~Treatment+Improved,data = Arthritis)
+with(Arthritis,xtabs(~Treatment+Improved,data = Arthritis))
+  
+margin.table(mytable,2) # sum by row
+prop.table(mytable,2)  #proportion by column
+prop.table(mytable)  #proportion by total
+  
+addmargins(mytable)
+addmargins(mytable,1)
+addmargins(prop.table(mytable,2),1)
+   
+library(gmodels)
+CrossTable(Arthritis$Treatment,Arthritis$Improved) ##SAS format

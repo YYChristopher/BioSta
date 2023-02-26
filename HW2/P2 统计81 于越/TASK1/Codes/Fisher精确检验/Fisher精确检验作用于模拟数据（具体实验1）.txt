@@ -1,0 +1,61 @@
+fisher exact test作用于模拟数据:
+prow <- 0.2
+qrow <- 1-prow
+p1 <- 0.1
+q1 <- 1-p1
+p2 <- 0.2
+q2 <- 1-p2
+N <- 50
+res1 <- rep(0,N)
+res1 <- as.vector(rbinom(N,1,prow))
+n1 <- 0
+n2 <- 0
+for(i in 1:N){
+  if(res1[i]==1)
+    n1 <- n1+1
+  else
+    n2 <- n2+1
+}
+res1row <- rep(0,n1)
+res1row <- as.vector(rbinom(n1,1,p1))
+n11 <- 0
+n12 <- 0
+for(i in 1:n1){
+  if(res1row[i]==1)
+    n11 <- n11+1
+  else
+    n12 <- n12+1
+}
+res2row <- rep(0,n2)
+res2row <- as.vector(rbinom(n2,1,p2))
+n21 <- 0
+n22 <- 0
+for(i in 1:n2){
+  if(res2row[i]==1)
+    n21 <- n21+1
+  else
+    n22 <- n22+1
+}
+n11
+n12
+n21
+n22
+m1 <- n11+n21
+m2 <- n12+n22
+
+nmax <- min(m1,m2,n1,n2)
+minob <- min(n11,n12,n21,n22)
+pr_a <- rep(0,nmax)
+for(a in 0:nmax){
+  pr_a[a+1] <- (factorial(n1)*factorial(n2)*factorial(m1)*factorial(m2))/(factorial(N)*factorial(a)*factorial(n1-a)*factorial(m1-a)*factorial(m2-n1+a))
+}
+p_low <- 0
+p_high <- 0
+for(i in 0:minob){
+  p_low <- p_low+pr_a[i+1]
+}
+for(i in minob:nmax){
+  p_high <- p_high+pr_a[i+1]
+}
+p_val <- 2*min(p_low,p_high,0.5)
+p_val

@@ -1,0 +1,38 @@
+Mcnemar Test作用于真实数据2：（精确检验）
+m11 <- 10
+m12 <- 10
+m21 <- 4
+m22 <- 16
+n11 <- 3
+n12 <- 7
+n21 <- 1
+n22 <- 9
+n_D <- n12+n21
+n_A <- n21
+n_B <- n12
+p_vallow <- 0
+p_valhigh <- 0
+X_2 <- ((abs(n_A-n_B)-1)^2)/(n_A+n_B)
+if(n_D<20)
+{
+  if(n_A<0.5*n_D)
+  {
+    for(k in 0:n_A)
+    {
+      p_vallow <- p_vallow+choose(n_D,k)*((0.5)^(n_D))
+    }
+    p_val <- 2*p_vallow
+  }
+  else if(n_A>0.5*n_D)
+  {
+    for(k in n_A:n_D)
+    {
+      p_valhigh <- p_valhigh+choose(n_D,k)*((0.5)^(n_D))
+    }
+    p_val <- 2*p_valhigh
+  }
+  else
+    p_val <- 1
+}
+
+quanchi <- qchisq(0.95,1,ncp=0)

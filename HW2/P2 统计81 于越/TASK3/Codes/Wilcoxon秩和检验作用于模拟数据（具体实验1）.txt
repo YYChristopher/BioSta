@@ -1,0 +1,69 @@
+Wilcoxon秩和检验作用于模拟数据（1）：
+Total <- c(1:55)
+p_div <- 0.45#数据分为两类
+divi <- as.vector(rbinom(length(Total),1,p_div))
+n1 <- 0
+n2 <- 0
+for(i in 1:length(divi)){
+  if(divi[i]==1)
+    n1 <- n1+1
+  else
+    n2 <- n2+1
+}
+part1 <- c(1:n1)
+part2 <- c(n1+1:n2)
+n <- n1+n2#每一类数据进行计数
+
+groupdivide <- function(arrays,n){#模拟数据的生成
+  k=1  #这里k是为了计数引入的
+  numof <- rep(0,n)
+  while (k<=n&&length(arrays)>0){
+    if(length(arrays)>=8)
+      m <- ceiling(runif(1,0,8))
+    else
+      m <- ceiling(runif(1,0,length(arrays)))
+    
+    numof[k] <- m
+    
+    fz <- sample(arrays,m,replace = FALSE,prob = NULL)
+    for (i in 1:m) {
+      arrays <- arrays[-which(arrays==fz[i])]#将抽中的从原列表中删除
+    }
+    k=k+1
+    print(fz)
+  }
+  print(arrays)
+  return(numof)
+}
+res1 <- as.vector(groupdivide(part1,8))
+res2 <- as.vector(groupdivide(part2,8))
+res <- res1+res2
+rankst <- rep(0,length(res))#计算秩的开始
+rankst[1] <- 1
+for(i in 2:length(rankst)){
+  if(res[i]!=0)
+    rankst[i] <-sum(res[1:i-1])+1
+  else
+    rankst[i] <- 0
+}
+rankend <- rep(0,length(res))#计算秩的末尾
+for(i in 1:length(rankend)){
+  if(res[i]!=0)
+    rankend[i] <- sum(res[1:i])
+  else
+    rankend[i] <- 0
+}
+Rank <- rep(0,length(rankst))#计算秩向量
+for(i in 1:length(Rank)){
+  Rank[i] <- (rankst[i]+rankend[i])/2
+}
+R1 <- 0
+for(i in 1:length(res1)){
+  R1 <- R1+res1[i]*Rank[i]
+}#求秩和
+mu <- (n1*(n+1))/2
+sigma <- sqrt((n1*n2*(n+1))/12)
+wilcox <- (abs(R1-mu)-0.5)/sigma#计算统计量
+p_val <- 2*(1-pnorm(wilcox,0,1))
+alpha <- 0.05
+quannorm <- qnorm(1-alpha/2,0,1)

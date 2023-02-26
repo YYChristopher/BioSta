@@ -1,0 +1,27 @@
+Fisher exact test作用于真实数据：
+n11 <- 2
+n12 <- 23
+n21 <- 5
+n22 <- 30
+m1 <- n11+n21
+m2 <- n12+n22
+n1 <- n11+n12
+n2 <- n21+n22
+N <- n11+n12+n21+n22
+
+nmax <- min(m1,m2,n1,n2)
+minob <- min(n11,n12,n21,n22)
+pr_a <- rep(0,nmax)
+for(a in 0:nmax){
+  pr_a[a+1] <- (factorial(n1)*factorial(n2)*factorial(m1)*factorial(m2))/(factorial(N)*factorial(a)*factorial(n1-a)*factorial(m1-a)*factorial(m2-n1+a))
+}
+p_low <- 0
+p_high <- 0
+for(i in 0:minob){
+  p_low <- p_low+pr_a[i+1]
+}
+for(i in minob:nmax){
+  p_high <- p_high+pr_a[i+1]
+}
+p_val <- 2*min(p_low,p_high,0.5)
+p_val
